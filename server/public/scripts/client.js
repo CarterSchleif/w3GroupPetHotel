@@ -16,6 +16,7 @@ function petHotelApp() {
 //         getAllPets()
 //         }
 populateSelect();
+getPets();
 }
 
 function addNewOwner() {
@@ -68,6 +69,35 @@ function addPetToPetOwnerTable (petToAdd){
   })
 }// end addPetToPetOwnerTable
 
+function checkForCheckedIn(data){
+  console.log(data, 'in cforc');
+  let checkedIn = data.pet_is_checked_in;
+  console.log(checkedIn);
+  let buttonToPass;
+  if(checkedIn == 'Yes'){
+    buttonToPass = `<button class="checkInOut" id="data.owner_id">Checked IN</button>`;
+  }
+  else{
+    buttonToPass = `<button class="checkInOut" id="data.owner_id">Checked OUT</button>`;
+  }
+  return buttonToPass;
+}//end checkForCheckedIn
+
+function getPets(){
+  console.log('in getPets');
+  $.ajax({
+    type: 'GET',
+    url: '/pet.router'
+  })
+    .done(function(data){
+      console.log( 'got petList: ', data );
+    writePets(data);
+    })
+    .fail(function(error){
+      console.log('failure on get getPets');
+    })
+}//end getPets
+
 function populateSelect(){
   $.ajax({
     url:'/owner.router',
@@ -90,6 +120,30 @@ function registerNewPet (){
   };
   addPetToPetTable(petToRegister);
 }//end registerNewPet
+
+function writePets(data){
+
+  $('#petView').empty();
+  for(i=0; i<data.length; i++){
+    console.log(data[i], 'in write');
+    let stringToAppend;
+    let ownerName = data[i].owner_first_name + data[i].owner_last_name;
+    let ownerID = data[i].owner_id;
+
+    let petName = data[i].pet_name;
+    let breed = data[i].pet_breed;
+    let color = data[i].pet_color;
+
+    let checkButton = checkForCheckedIn (data[i]);
+
+    stringToAppend +=`<tr><td>${ownerName}</td><td>${petName}</td><td>${breed}</td>
+                      <td>${color}</td><td><button class="updateButton" id="ownerID">Update</button></td>
+                      <td><button class="deleteButton" id="ownerID">Delete</button><td>${checkButton}</td</tr>`;
+    $('#petView').append(stringToAppend);
+  }//end for loop
+  // clearInputs();
+};//end writePets
+
 
 function writeToSelect(data){
   console.log(data, 'data in write to select');

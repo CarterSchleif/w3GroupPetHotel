@@ -6,10 +6,12 @@ const pool= require('../modules/pool');
 
 router.get('/', (req, res) => {
 
-    const queryText = `SELECT owner.id, owner.first_name, owner.last_name, pet.id AS pet_id, pet.pet_name, pet.breed, pet.color, pet.is_checked_in
-    FROM owner
-    JOIN pet ON owner.id = pet.owner_id
-    ORDER BY owner.last_name, pet.is_checked_in;`
+    const queryText = `SELECT owner.owner_id, owner.owner_first_name, owner.owner_last_name,
+                      pet.pet_id, pet.pet_name, pet.pet_breed, pet.pet_color, pet.pet_is_checked_in
+    FROM pet
+    JOIN owner_pet ON pet.pet_id = owner_pet.owner_pet_pet_id
+    JOIN owner ON owner.owner_id = owner_pet.owner_pet_owner_id
+    ORDER BY owner.owner_last_name, pet.pet_is_checked_in;`
     pool.query(queryText)
         .then((result) => {
             console.log('"/" Results of GET query for pet: ', result.rows);
