@@ -25,6 +25,27 @@ router.get('/', (req, res) => {
 });
 // End GET route.
 
+router.get('/:id', (req, res) => {
+const id = req.params.id;
+const queryText = `SELECT * FROM pet
+JOIN owner_pet ON pet.pet_id = owner_pet.owner_pet_pet_id
+JOIN owner ON owner.owner_id = owner_pet.owner_pet_owner_id
+                    WHERE owner.owner_id = $1;`;
+pool.query(queryText, [id])
+  .then((result) => {
+    console.log('success in edit GET', result.rows);
+    res.send(result.rows)
+  })
+  .catch((err) => {
+    console.log('error in edit get', err);
+    res.sendStatus(500);
+  })
+
+
+})//end edit get
+
+
+
 // POST route start.
 router.post('/', (req,res) => {
 
@@ -59,62 +80,63 @@ router.post('/pet_owner', (req, res) => {
 
 
 // Start PUT route.
-router.put ('/:id', (req, res) => {
-    let queryText = `UPDATE pet SET  is_checked_in = $1 WHERE id = $2`;
-    pool.query(queryText, [req.body.is_checked_in, req.params.id])
-        .then((results) =>{
-            console.log('LOGING REQ.BODY.IS_CHECKED_IN: ', req.body.is_checked_in);
-            if (req.body.is_checked_in == 'true') {
-                let queryText = `INSERT INTO visits (pet_id) VALUES ($1)`
-                             pool.query(queryText, [req.params.id])
-                             .then((results) =>{
-                                 console.log('IN INSERT NEW TIME TO VISITS');
-                                 res.sendStatus(201);
-                             })
-                             .catch((err) =>{
-                                 console.log('error making update pet status query:', err);
-                                 res.sendStatus(500);
-                             });
-            }
-            else if (req.body.is_checked_in == 'false') {
-                let queryText = `SELECT visits.id FROM visits WHERE pet_id = $1 AND check_out_date is NULL;`
-                             pool.query(queryText, [req.params.id])
-                             .then((results) =>{
-
-                                let queryText = `UPDATE visits SET check_out_date = now() WHERE pet_id = $1 AND visits.id = $2;`
-                                pool.query(queryText, [req.params.id, results.rows[0].id])
-                                    .then((results) =>{
-                                        console.log('IN INSERT CHECKOUT TIME TO VISITS');
-                                        res.sendStatus(201);
-                                    })
-                                    .catch((err) =>{
-                                        console.log('error making update pet status query:', err);
-                                        res.sendStatus(500);
-                                    });
-
-
-                             })
-                             .catch((err) =>{
-                                 console.log('error making update pet status query:', err);
-                                 res.sendStatus(500);
-                             });
-            }
-
-        })
-        .catch((err) =>{
-            console.log('error making update pet status query:', err);
-            res.sendStatus(500);
-        });
-});
+// router.put ('/:id', (req, res) => {
+//     let queryText = `UPDATE pet SET  is_checked_in = $1 WHERE id = $2`;
+//     pool.query(queryText, [req.body.is_checked_in, req.params.id])
+//         .then((results) =>{
+//             console.log('LOGING REQ.BODY.IS_CHECKED_IN: ', req.body.is_checked_in);
+//             if (req.body.is_checked_in == 'true') {
+//                 let queryText = `INSERT INTO visits (pet_id) VALUES ($1)`
+//                              pool.query(queryText, [req.params.id])
+//                              .then((results) =>{
+//                                  console.log('IN INSERT NEW TIME TO VISITS');
+//                                  res.sendStatus(201);
+//                              })
+//                              .catch((err) =>{
+//                                  console.log('error making update pet status query:', err);
+//                                  res.sendStatus(500);
+//                              });
+//             }
+//             else if (req.body.is_checked_in == 'false') {
+//                 let queryText = `SELECT visits.id FROM visits WHERE pet_id = $1 AND check_out_date is NULL;`
+//                              pool.query(queryText, [req.params.id])
+//                              .then((results) =>{
+//
+//                                 let queryText = `UPDATE visits SET check_out_date = now() WHERE pet_id = $1 AND visits.id = $2;`
+//                                 pool.query(queryText, [req.params.id, results.rows[0].id])
+//                                     .then((results) =>{
+//                                         console.log('IN INSERT CHECKOUT TIME TO VISITS');
+//                                         res.sendStatus(201);
+//                                     })
+//                                     .catch((err) =>{
+//                                         console.log('error making update pet status query:', err);
+//                                         res.sendStatus(500);
+//                                     });
+//
+//
+//                              })
+//                              .catch((err) =>{
+//                                  console.log('error making update pet status query:', err);
+//                                  res.sendStatus(500);
+//                              });
+//             }
+//
+//         })
+//         .catch((err) =>{
+//             console.log('error making update pet status query:', err);
+//             res.sendStatus(500);
+//         });
+// });
 // End PUT route
 
 // Start PUT route
 router.put ('/update/:id', (req, res) => {
-    let queryText = `UPDATE pet SET pet_name =$1, breed =$2, color=$3 WHERE id = $4`;
-    pool.query(queryText, [req.body.pet_name, req.body.breed, req.body.color, req.params.id])
+  console.log(req.params.id);
+    let queryText = `UPDATE pet SET pet_name =$1, pet_breed =$2, pet_color=$3 WHERE pet_id = $4`;
+    pool.query(queryText, [req.body.editName, req.body.editBreed, req.body.editColor, req.params.id])
     .then((results) =>{
         console.log('updated pet info: ', results);
-        res.send(results);
+        res.sendStatus(200);
     })
     .catch((err) =>{
         console.log('error updating pet info:', err);

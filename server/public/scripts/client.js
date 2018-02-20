@@ -7,9 +7,15 @@ function petHotelApp() {
     $('#registerButton').on('click', addNewOwner);
     $('#register_new_pet').on('click', registerNewPet);
     // $('#tableBody').on('click', '.deleteButton', deletePet);
-    // $('#tableBody').on('click', '.editButton', editPet);
+    // $('#petView').on('click', '.updateButton', editPet ($(this).data('id')));
+  $('#petView').on('click', '.updateButton', function(){
+    editPet($(this).attr('id'));
+  })
+  $('#editField').on('click', '.submitEdit', function(){
+    postEditPet ($(this).attr('id'));
+  })
     // $('#tableBody').on('click', '.checkStatus', updatePetStatus);
-    // $('#tableBody').on('click', '.update_pet', updatePetInformation);
+    // $('#petView').on('click', '.update_pet', updatePetInformation);
     // $('#showVisitsButton').on('click', getPetVisits);
 //     if (location.pathname == '/') {
 //         console.log('Inside Location Pathname');
@@ -17,6 +23,7 @@ function petHotelApp() {
 //         }
 populateSelect();
 getPets();
+$('#editField').hide();
 }
 
 function addNewOwner() {
@@ -70,9 +77,7 @@ function addPetToPetOwnerTable (petToAdd){
 }// end addPetToPetOwnerTable
 
 function checkForCheckedIn(data){
-  console.log(data, 'in cforc');
   let checkedIn = data.pet_is_checked_in;
-  console.log(checkedIn);
   let buttonToPass;
   if(checkedIn == 'Yes'){
     buttonToPass = `<button class="checkInOut" id="data.owner_id">Checked IN</button>`;
@@ -82,6 +87,38 @@ function checkForCheckedIn(data){
   }
   return buttonToPass;
 }//end checkForCheckedIn
+
+function clearInputs(){
+
+}
+
+function editPet(id) {
+  console.log('in editpet');
+  console.log(id);
+  $('#editField').show();
+
+  $.ajax({
+    type: 'GET',
+    url: `pet.router/${id}`
+  }).done(function(data){
+    console.log('success in edit GET', data);
+    fillEditField(data);
+  })
+  .fail(function(error){
+    console.log(error, 'error in editGET');
+  })
+}
+
+function fillEditField (data){
+  console.log('in filledit', data);
+  $('#edit_pet_name').val(data[0].pet_name);
+  $('#edit_pet_breed').val(data[0].pet_breed);
+  $('#edit_pet_color').val(data[0].pet_color);
+  $('#editField').append(`<button class='submitEdit' id="${data[0].pet_id}">Submit Edit</button>`)
+}//end fillEditField
+
+
+
 
 function getPets(){
   console.log('in getPets');
@@ -111,6 +148,25 @@ function populateSelect(){
   })
 }//end populateSelect
 
+function postEditPet(id){
+  console.log(id, 'in post edit');
+  $.ajax({
+    type: 'PUT',
+    url: `/pet.router/update/${id}`,
+    data: {
+      editName:   $('#edit_pet_name').val(),
+      editBreed:  $('#edit_pet_breed').val(),
+      editColor:  $('#edit_pet_color').val(),
+    }
+  }).done(function(data){
+    console.log('success in editpet', data);
+    $('editField').hide();
+  })
+  .fail(function(error){
+    console.log('error on put', error);
+  })
+}//postEditPet
+
 function registerNewPet (){
   const petToRegister = {
     pet_name: $('#pet_name').val(),
@@ -137,8 +193,8 @@ function writePets(data){
     let checkButton = checkForCheckedIn (data[i]);
 
     stringToAppend +=`<tr><td>${ownerName}</td><td>${petName}</td><td>${breed}</td>
-                      <td>${color}</td><td><button class="updateButton" id="ownerID">Update</button></td>
-                      <td><button class="deleteButton" id="ownerID">Delete</button><td>${checkButton}</td</tr>`;
+                      <td>${color}</td><td><button class="updateButton" id=${ownerID}>Update</button></td>
+                      <td><button class="deleteButton" id=${ownerID}>Delete</button><td>${checkButton}</td</tr>`;
     $('#petView').append(stringToAppend);
   }//end for loop
   // clearInputs();
