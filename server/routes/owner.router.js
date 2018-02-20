@@ -1,6 +1,7 @@
 const express = require('express');
 const router = express.Router();
-const pool= require('../modules/pool');
+const pool = require('../modules/pool');
+const bodyParser = require('body-parser');
 
 // Start GET route.
 router.get('/', (req, res) => {
@@ -18,14 +19,17 @@ router.get('/', (req, res) => {
 // End GET route.
 
 // Start POST route.
-router.post('/', (req, res) => {
-    const queryText = `INSERT INTO owners (first_name, last_name) VALUES($1, $2)`;
-    pool.query(queryText,[req.body.first_name, req.body.last_name])
+router.post('/', (request, response) => {
+    console.log(request.body, 'in owner post');
+    const queryText = `INSERT INTO owner (owner_first_name, owner_last_name) VALUES($1, $2)`;
+    pool.query(queryText,[request.body.first_name, request.body.last_name])
     .then((result) => {
-        res.sendStatus(201);
+        response.sendStatus(201);
+        console.log('success in owner post');
     })
-    .catch((err) => {
-        res.sendStatus(500);
+    .catch((error) => {
+      console.log('error in owner post', error);
+        response.sendStatus(500);
     })
 })
 // End POST route.

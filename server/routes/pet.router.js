@@ -26,8 +26,8 @@ router.get('/', (req, res) => {
 // POST route start.
 router.post('/', (req,res) => {
 
-    const queryText = 'INSERT INTO pet (pet_name, breed, color, owner_id) VALUES ($1, $2, $3, $4)';
-    pool.query(queryText, [req.body.pet_name, req.body.breed, req.body.color, req.body.owner_id])//Start of initial post query
+    const queryText = 'INSERT INTO pet (pet_name, pet_breed, pet_color) VALUES ($1, $2, $3)';
+    pool.query(queryText, [req.body.pet_name, req.body.pet_breed, req.body.pet_color])//Start of initial post query
         .then((result) => {
             console.log('registed new pet');
             res.sendStatus(201);
@@ -39,6 +39,22 @@ router.post('/', (req,res) => {
 
 });
 //End POST route.
+
+router.post('/pet_owner', (req, res) => {
+
+  const queryText = `INSERT INTO owner_pet (owner_pet_owner_id, owner_pet_pet_id)
+                    VALUES (($1), (SELECT pet_id FROM pet WHERE pet_name = $2));`;
+  pool.query(queryText, [req.body.pet_owner, req.body.pet_name])
+      .then((result) => {
+        console.log('added pet to owner_pet', result);
+        res.sendStatus(201);
+      })
+      .catch((err) => {
+        console.log('error in pet_owner post', err);
+        res.sendStatus(500);
+      })
+});
+
 
 // Start PUT route.
 router.put ('/:id', (req, res) => {
