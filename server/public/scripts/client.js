@@ -70,6 +70,8 @@ function addPetToPetOwnerTable (petToAdd){
     data: petToAdd
   }).done(function(data){
     console.log('added pet', data);
+    getPets();
+
   })
   .fail(function(error){
     console.log('failure on pet POST');
@@ -89,8 +91,12 @@ function checkForCheckedIn(data){
 }//end checkForCheckedIn
 
 function clearInputs(){
-
-}
+  $('#owner_first_name').val('');
+  $('#owner_last_name').val('');
+  $('#pet_name').val('');
+  $('#pet_breed').val('');
+  $('#pet_color').val('');
+}//end clearInputs
 
 function editPet(id) {
   console.log('in editpet');
@@ -160,7 +166,13 @@ function postEditPet(id){
     }
   }).done(function(data){
     console.log('success in editpet', data);
-    $('editField').hide();
+    $('#edit_pet_name').val('');
+    $('#edit_pet_breed').val('');
+    $('#edit_pet_color').val('');
+    $('.submitEdit').remove();
+    $('#editField').hide();
+    getPets();
+
   })
   .fail(function(error){
     console.log('error on put', error);
@@ -197,7 +209,7 @@ function writePets(data){
                       <td><button class="deleteButton" id=${ownerID}>Delete</button><td>${checkButton}</td</tr>`;
     $('#petView').append(stringToAppend);
   }//end for loop
-  // clearInputs();
+  clearInputs();
 };//end writePets
 
 
