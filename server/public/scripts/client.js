@@ -43,6 +43,8 @@ function addOwnerToOwnerTable(newOwner){
   }).done(function(data){
       console.log( 'added owner: ', data );
       populateSelect();
+      clearInputs();
+
   })
     .fail(function(error){
       console.log('failure on post owner');
