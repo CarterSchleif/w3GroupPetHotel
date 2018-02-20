@@ -160,4 +160,25 @@ router.delete ('/:id', (req, res) => {
 });
 // End DELETE route
 
+// Start GET route.
+router.get('/visits/:id', (req, res) => {
+    const queryText =   `SELECT owner.id, owner.first_name, owner.last_name, pet.id AS pet_id, 
+                        pet_name, pet.breed, pet.color, pet.is_checked_in, visits.check_in_date, 
+                        visits.check_out_date 
+                        FROM owner 
+                        JOIN pet ON owner.id = pet.owner_id
+                        JOIN visits ON pet.id = visits.pet_id
+                        WHERE owner.id = ${req.params.id}
+                        ORDER BY owner.last_name, visits.check_out_date DESC;`
+    pool.query(queryText)
+    .then((result) => {
+        console.log('"/" GET results from query for visits: ', result.rows);
+        res.send(result.rows);
+        })
+    .catch((err) => {
+        console.log('Error on "/visits" GET', err);
+        res.sendStatus(500);
+        })
+})
+
 module.exports = router;
