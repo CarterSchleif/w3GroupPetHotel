@@ -6,7 +6,9 @@ function petHotelApp() {
     // Event listeners
     $('#registerButton').on('click', addNewOwner);
     $('#register_new_pet').on('click', registerNewPet);
-    // $('#tableBody').on('click', '.deleteButton', deletePet);
+    $('#petView').on('click', '.deleteButton', function(){
+      deleteOwnerPet($(this).attr('id'));
+    })
     // $('#petView').on('click', '.updateButton', editPet ($(this).data('id')));
   $('#petView').on('click', '.updateButton', function(){
     editPet($(this).attr('id'));
@@ -99,6 +101,34 @@ function clearInputs(){
   $('#pet_breed').val('');
   $('#pet_color').val('');
 }//end clearInputs
+
+function deleteOwnerPet(id){
+  console.log('in delete pet', id);
+  $.ajax({
+    type: 'DELETE',
+    url: `/owner.router/${id}`
+  }).done(function(data){
+    console.log('success in delete from owner_pet', data);
+    deletePet(id);
+  })
+  .fail(function(data){
+    console.log('error in delete owner pet', error);
+  })
+}
+
+function deletePet(id){
+  console.log('in delete pet2', id);
+  $.ajax({
+    type: 'DELETE',
+    url: `/pet.router/${id}`
+  }).done(function(data){
+    console.log('success in delete2 from pet', data);
+    getPets()
+  })
+  .fail(function(data){
+    console.log('fail in delete2', error);
+  })
+}
 
 function editPet(id) {
   console.log('in editpet');
@@ -199,6 +229,7 @@ function writePets(data){
     let stringToAppend;
     let ownerName = data[i].owner_first_name + data[i].owner_last_name;
     let ownerID = data[i].owner_id;
+    let petID = data[i].pet_id;
 
     let petName = data[i].pet_name;
     let breed = data[i].pet_breed;
@@ -208,7 +239,7 @@ function writePets(data){
 
     stringToAppend +=`<tr><td>${ownerName}</td><td>${petName}</td><td>${breed}</td>
                       <td>${color}</td><td><button class="updateButton" id=${ownerID}>Update</button></td>
-                      <td><button class="deleteButton" id=${ownerID}>Delete</button><td>${checkButton}</td</tr>`;
+                      <td><button class="deleteButton" id=${petID}>Delete</button><td>${checkButton}</td</tr>`;
     $('#petView').append(stringToAppend);
   }//end for loop
   clearInputs();

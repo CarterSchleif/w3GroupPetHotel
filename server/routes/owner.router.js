@@ -18,6 +18,20 @@ router.get('/', (req, res) => {
 })
 // End GET route.
 
+router.delete ('/:id', (req, res) => {
+    let queryText = `DELETE FROM owner_pet WHERE owner_pet_pet_id = $1`;
+    pool.query(queryText, [req.params.id])
+    .then((results) =>{
+        console.log('query delete results: ', results);
+        res.send(results);
+    })
+    .catch((err) =>{
+        console.log('error making delete query:', err);
+        res.sendStatus(500);
+    });
+});
+
+
 // Start POST route.
 router.post('/', (request, response) => {
     console.log(request.body, 'in owner post');

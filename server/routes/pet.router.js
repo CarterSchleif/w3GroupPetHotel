@@ -147,7 +147,7 @@ router.put ('/update/:id', (req, res) => {
 
 //Start DELETE route
 router.delete ('/:id', (req, res) => {
-    let queryText = `DELETE FROM pet WHERE id = $1`;
+    let queryText = `DELETE FROM pet WHERE pet_id = $1`;
     pool.query(queryText, [req.params.id])
     .then((results) =>{
         console.log('query delete results: ', results);
@@ -162,10 +162,10 @@ router.delete ('/:id', (req, res) => {
 
 // Start GET route.
 router.get('/visits/:id', (req, res) => {
-    const queryText =   `SELECT owner.id, owner.first_name, owner.last_name, pet.id AS pet_id, 
-                        pet_name, pet.breed, pet.color, pet.is_checked_in, visits.check_in_date, 
-                        visits.check_out_date 
-                        FROM owner 
+    const queryText =   `SELECT owner.id, owner.first_name, owner.last_name, pet.id AS pet_id,
+                        pet_name, pet.breed, pet.color, pet.is_checked_in, visits.check_in_date,
+                        visits.check_out_date
+                        FROM owner
                         JOIN pet ON owner.id = pet.owner_id
                         JOIN visits ON pet.id = visits.pet_id
                         WHERE owner.id = ${req.params.id}
