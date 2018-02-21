@@ -135,27 +135,27 @@ router.delete ('/:id', (req, res) => {
   });
 });// End DELETE route
 
-router.get('/visits', function (request, response) {
-  const sqlText = `SELECT * FROM visits 
-                  JOIN pets on pets.id = visits.pet_id;`;
-  pool.query(sqlText)
-  .then(function (result) {
-     response.send(result.rows);    
-  }).catch(function (error) {
-      response.sendStatus(500);
-  })
-})
+
 
 
 // Start GET route.
 router.get('/visits/:id', (req, res) => {
+    console.log(req.params.id, 'where are you');
+    
+    const queryText = `SELECT owner.owner_id, owner.owner_first_name, owner.owner_last_name, pet.pet_id, pet.pet_name, pet.pet_breed, pet.pet_color, pet.pet_is_checked_in, visits.check_in_date, visits.check_out_date
 
-    const queryText = `SELECT owner.id, owner.first_name, owner.last_name, pet.id AS pet_id, pet.pet_name, pet.pet_breed, pet.pet_color, pet.pet_is_checked_in, visits.check_in_date, visits.check_out_date
-                       FROM owner
-                       JOIN pet ON owner.id = pet.owner_id
-                       JOIN visits ON pet.id = visits.pet_id
-                       WHERE owner.id = ${req.params.id}
-                       ORDER BY owner.last_name, visits.check_out_date DESC;`
+    FROM owner
+
+    JOIN owner_pet ON owner.owner_id = owner_pet.owner_pet_owner_id
+    JOIN pet ON owner_pet.owner_pet_pet_id = pet.pet_id
+
+    JOIN visits ON pet.pet_id = visits.pet_id
+
+    WHERE owner.owner_id = ${req.params.id}
+
+    ORDER BY owner.owner_last_name,
+    visits.check_out_date DESC;`
+    
     pool.query(queryText)
         .then((result) => {
             console.log('"/" Results GET query for visits: ', result.rows); 

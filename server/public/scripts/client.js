@@ -262,9 +262,10 @@ $.ajax({
 }//end updatePetStatus
 
 function getPetVisits() {
-  console.log('Inside getPetVisits');
+  let id = $('#owner_select').val();
+  // option:selected').data('id')
+  console.log('Inside getPetVisits', id);
   
-  let id = $('#owner_select option:selected').data('id')
   $.ajax({
       method: 'GET',
       url: `/pet.router/visits/${id}`,
@@ -282,7 +283,7 @@ function getPetVisits() {
 function displayPetVisits(data) {
   $tableRow = $('<tr>');
   $tableRow.append(`<td>${data.pet_name}</td>`);
-  $tableRow.append(`<td>${data.pet_reed}</td>`);
+  $tableRow.append(`<td>${data.pet_breed}</td>`);
   $tableRow.append(`<td>${data.pet_color}</td>`);
   $tableRow.append(`<td>${data.check_in_date.substr(0, 10)}</td>`);
   if (data.check_out_date == null) {
