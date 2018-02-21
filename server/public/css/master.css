@@ -1,0 +1,29 @@
+#tableSection{
+  margin-left: 30px;
+}
+#petInput{
+  margin-left: 30px;
+}
+#ownerInput{
+  margin-left: 30px;
+}
+body{
+  font-family: 'Raleway', sans-serif !important;
+  background-color: Powderblue !important;
+  margin-left: 10px;
+
+}
+input{
+  background-color: papayawhip !important;
+}
+
+h1{
+  font-size: 70px !important;
+  margin-left: 10px;
+}
+button{
+  background-color: papayawhip !important;
+}
+select{
+  background-color: papayawhip !important;
+}

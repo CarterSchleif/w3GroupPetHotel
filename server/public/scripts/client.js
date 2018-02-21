@@ -9,36 +9,29 @@ function petHotelApp() {
     $('#petView').on('click', '.deleteButton', function(){
       deleteOwnerPet($(this).attr('id'));
     })
-  $('#petView').on('click', '.updateButton', function(){
-    editPet($(this).attr('id'));
-  })
-  $('#editField').on('click', '.submitEdit', function(){
-    postEditPet ($(this).attr('id'));
-  })
+    $('#petView').on('click', '.updateButton', function(){
+      editPet($(this).attr('id'));
+    })
+    $('#editField').on('click', '.submitEdit', function(){
+      postEditPet ($(this).attr('id'));
+    })
     $('#petView').on('click', '.checkIn', function(){
       updatePetStatus($(this).attr('id'), 'Yes');
     });
     $('#petView').on('click', '.checkOut', function(){
       updatePetStatus($(this).attr('id'), 'No' );
     });
-    // $('#petView').on('click', '.update_pet', updatePetInformation);
-    // $('#showVisitsButton').on('click', getPetVisits);
-//     if (location.pathname == '/') {
-//         console.log('Inside Location Pathname');
-//         getAllPets()
-//         }
-populateSelect();
-getPets();
-$('#editField').hide();
-}
+    populateSelect();
+    getPets();
+    $('#editField').hide();
+}//end petHotelApp
 
 function addNewOwner() {
-    const ownerToSend = {
-        first_name: $('#owner_first_name').val(),
-        last_name: $('#owner_last_name').val()
-    };
-    addOwnerToOwnerTable(ownerToSend);
-
+  const ownerToSend = {
+    first_name: $('#owner_first_name').val(),
+    last_name: $('#owner_last_name').val()
+  };
+  addOwnerToOwnerTable(ownerToSend);
 }//end addNewOwner
 
 function addOwnerToOwnerTable(newOwner){
@@ -50,7 +43,6 @@ function addOwnerToOwnerTable(newOwner){
       console.log( 'added owner: ', data );
       populateSelect();
       clearInputs();
-
   })
     .fail(function(error){
       console.log('failure on post owner');
@@ -77,9 +69,8 @@ function addPetToPetOwnerTable (petToAdd){
     type: 'POST',
     data: petToAdd
   }).done(function(data){
-    console.log('added pet', data);
+    console.log('added pet to owner_pet table', data);
     getPets();
-
   })
   .fail(function(error){
     console.log('failure on pet POST');
@@ -118,7 +109,7 @@ function deleteOwnerPet(id){
   .fail(function(data){
     console.log('error in delete owner pet', error);
   })
-}
+}//end deleteOwnerPet
 
 function deletePet(id){
   console.log('in delete pet2', id);
@@ -132,13 +123,12 @@ function deletePet(id){
   .fail(function(data){
     console.log('fail in delete2', error);
   })
-}
+}//end deletePet
 
 function editPet(id) {
   console.log('in editpet');
   console.log(id);
   $('#editField').show();
-
   $.ajax({
     type: 'GET',
     url: `pet.router/${id}`
@@ -149,7 +139,7 @@ function editPet(id) {
   .fail(function(error){
     console.log(error, 'error in editGET');
   })
-}
+}//end editpet
 
 function fillEditField (data){
   console.log('in filledit', data);
@@ -158,9 +148,6 @@ function fillEditField (data){
   $('#edit_pet_color').val(data[0].pet_color);
   $('#editField').append(`<button class='submitEdit' id="${data[0].pet_id}">Submit Edit</button>`)
 }//end fillEditField
-
-
-
 
 function getPets(){
   console.log('in getPets');
@@ -226,22 +213,19 @@ function registerNewPet (){
 }//end registerNewPet
 
 function writePets(data){
-
   $('#petView').empty();
   for(i=0; i<data.length; i++){
     console.log(data[i], 'in write');
     let stringToAppend;
-    let ownerName = data[i].owner_first_name + data[i].owner_last_name;
+    let ownerName = data[i].owner_first_name +' '+ data[i].owner_last_name;
     let ownerID = data[i].owner_id;
     let petID = data[i].pet_id;
-
     let petName = data[i].pet_name;
     let breed = data[i].pet_breed;
     let color = data[i].pet_color;
-
     let checkButton = checkForCheckedIn (data[i]);
 
-    stringToAppend +=`<tr><td>${ownerName}</td><td>${petName}</td><td>${breed}</td>
+    stringToAppend +=`<tr scope="row"><td>${ownerName}</td><td>${petName}</td><td>${breed}</td>
                       <td>${color}</td><td><button class="updateButton" id=${ownerID}>Update</button></td>
                       <td><button class="deleteButton" id=${petID}>Delete</button><td>${checkButton}</td</tr>`;
     $('#petView').append(stringToAppend);
@@ -249,11 +233,9 @@ function writePets(data){
   clearInputs();
 };//end writePets
 
-
 function writeToSelect(data){
   console.log(data, 'data in write to select');
   $('#owner_select').empty()
-
   for(i=0; i<data.length; i++){
     let ownerToWrite = data[i];
     console.log(ownerToWrite);
@@ -264,10 +246,6 @@ function writeToSelect(data){
 
 function updatePetStatus(id, answer) {
   console.log('in updatePetStatus ', id, answer, 'answer');
-
-        // if (confirm('Are you sure you want to Check In your pet?')) {
-        //     let pet_is_checked_in = 'Yes'
-        //     console.log('id', id, 'anwser',pet_is_checked_in);
 $.ajax({
     method: 'PUT',
     url: `/pet.router/${id}`,
@@ -275,29 +253,7 @@ $.ajax({
   }).done(function(data){
     console.log('successs put');
     getPets();
-
   }).fail(function(error){
     console.log('fail');
   })
-}
-    //     if (confirm('Are you sure you want to Check Out your pet?')) {
-    //         let id = $(this).val()
-    //         let petStatus = {
-    //             pet_is_checked_in: false
-    //         }
-    //         console.log(id);
-    //         $.ajax({
-    //             method: 'PUT',
-    //             url: '/pet.router/' + id,
-    //             data: petStatus,
-    //             success: (response)=>{
-    //                 console.log('Inside updatePetStatus checkout PUT ajax: ', response);
-    //                 getPets()
-    //             },
-    //             error: () => {
-    //                 alert('Error was received in checking out your pet')
-    //             }
-    //         })
-    //     }
-    // }
-// }
+}//end updatePetStatus

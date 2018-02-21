@@ -11,7 +11,7 @@ router.get('/', (req, res) => {
     FROM pet
     JOIN owner_pet ON pet.pet_id = owner_pet.owner_pet_pet_id
     JOIN owner ON owner.owner_id = owner_pet.owner_pet_owner_id
-    ORDER BY owner.owner_last_name, pet.pet_is_checked_in;`
+    ORDER BY pet.pet_is_checked_in desc, owner.owner_last_name;`;
     pool.query(queryText)
         .then((result) => {
             console.log('"/" Results of GET query for pet: ', result.rows);
@@ -87,41 +87,6 @@ router.put ('/:id', (req, res) => {
         .then((results) =>{
             console.log('LOGING REQ.BODY: ', req.body.answer);
             res.sendStatus(200);
-            // if (req.body == 'Yes') {
-            //     let queryText = `INSERT INTO visits (pet_id) VALUES ($1)`
-            //                  pool.query(queryText, [req.params.id])
-            //                  .then((results) =>{
-            //                      console.log('IN INSERT NEW TIME TO VISITS');
-            //                      res.sendStatus(201);
-            //                  })
-            //                  .catch((err) =>{
-            //                      console.log('error making update pet status query:', err);
-            //                      res.sendStatus(500);
-            //                  });
-            // }
-            // else if (req.body == 'No') {
-            //     let queryText = `SELECT visits.id FROM visits WHERE pet_id = $1 AND check_out_date is NULL;`
-            //                  pool.query(queryText, [req.params.id])
-            //                  .then((results) =>{
-            //
-            //                     let queryText = `UPDATE visits SET check_out_date = now() WHERE pet_id = $1 AND visits.id = $2;`
-            //                     pool.query(queryText, [req.params.id, results.rows[0].id])
-            //                         .then((results) =>{
-            //                             console.log('IN INSERT CHECKOUT TIME TO VISITS');
-            //                             res.sendStatus(201);
-            //                         })
-            //                         .catch((err) =>{
-            //                             console.log('error making update pet status query:', err);
-            //                             res.sendStatus(500);
-            //                         });
-            //
-            //
-            //                  })
-            //                  .catch((err) =>{
-            //                      console.log('error making update pet status query:', err);
-            //                      res.sendStatus(500);
-            //                  });
-            // }
 
         })
         .catch((err) =>{
