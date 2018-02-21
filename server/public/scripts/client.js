@@ -9,14 +9,18 @@ function petHotelApp() {
     $('#petView').on('click', '.deleteButton', function(){
       deleteOwnerPet($(this).attr('id'));
     })
-    // $('#petView').on('click', '.updateButton', editPet ($(this).data('id')));
   $('#petView').on('click', '.updateButton', function(){
     editPet($(this).attr('id'));
   })
   $('#editField').on('click', '.submitEdit', function(){
     postEditPet ($(this).attr('id'));
   })
-    // $('#tableBody').on('click', '.checkStatus', updatePetStatus);
+    $('#petView').on('click', '.checkIn', function(){
+      updatePetStatus($(this).attr('id'), 'Yes');
+    });
+    $('#petView').on('click', '.checkOut', function(){
+      updatePetStatus($(this).attr('id'), 'No' );
+    });
     // $('#petView').on('click', '.update_pet', updatePetInformation);
     // $('#showVisitsButton').on('click', getPetVisits);
 //     if (location.pathname == '/') {
@@ -86,10 +90,10 @@ function checkForCheckedIn(data){
   let checkedIn = data.pet_is_checked_in;
   let buttonToPass;
   if(checkedIn == 'Yes'){
-    buttonToPass = `<button class="checkInOut" id="data.owner_id">Checked IN</button>`;
+    buttonToPass = `<button class="checkOut" id=${data.pet_id}>Check OUT Pet</button>`;
   }
   else{
-    buttonToPass = `<button class="checkInOut" id="data.owner_id">Checked OUT</button>`;
+    buttonToPass = `<button class="checkIn" id=${data.pet_id}>Check IN Pet</button>`;
   }
   return buttonToPass;
 }//end checkForCheckedIn
@@ -256,3 +260,44 @@ function writeToSelect(data){
     $('#owner_select').append(`<option value="${ownerToWrite.owner_id}">${ownerToWrite.owner_first_name}`+' '+`${ownerToWrite.owner_last_name}</option>`);
   }//end for
 }//end writeToSelect
+
+
+function updatePetStatus(id, answer) {
+  console.log('in updatePetStatus ', id, answer, 'answer');
+
+        // if (confirm('Are you sure you want to Check In your pet?')) {
+        //     let pet_is_checked_in = 'Yes'
+        //     console.log('id', id, 'anwser',pet_is_checked_in);
+$.ajax({
+    method: 'PUT',
+    url: `/pet.router/${id}`,
+    data: {answer: answer}
+  }).done(function(data){
+    console.log('successs put');
+    getPets();
+
+  }).fail(function(error){
+    console.log('fail');
+  })
+}
+    //     if (confirm('Are you sure you want to Check Out your pet?')) {
+    //         let id = $(this).val()
+    //         let petStatus = {
+    //             pet_is_checked_in: false
+    //         }
+    //         console.log(id);
+    //         $.ajax({
+    //             method: 'PUT',
+    //             url: '/pet.router/' + id,
+    //             data: petStatus,
+    //             success: (response)=>{
+    //                 console.log('Inside updatePetStatus checkout PUT ajax: ', response);
+    //                 getPets()
+    //             },
+    //             error: () => {
+    //                 alert('Error was received in checking out your pet')
+    //             }
+    //         })
+    //     }
+    // }
+// }
