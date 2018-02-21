@@ -243,7 +243,6 @@ function writeToSelect(data){
   }//end for
 }//end writeToSelect
 
-
 function updatePetStatus(id, answer) {
   console.log('in updatePetStatus ', id, answer, 'answer');
 $.ajax({
