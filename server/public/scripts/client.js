@@ -21,6 +21,10 @@ function petHotelApp() {
     $('#petView').on('click', '.checkOut', function(){
       updatePetStatus($(this).attr('id'), 'No' );
     });
+    $('#showVisitsButton').on('click', getPetVisits);
+    // $('#showVisitsButton').on('click', function(){
+    //   getPetVisits($(this).attr('id'));
+    // });
     populateSelect();
     getPets();
     $('#editField').hide();
@@ -256,3 +260,37 @@ $.ajax({
     console.log('fail');
   })
 }//end updatePetStatus
+
+function getPetVisits() {
+  let id = $('#owner_select').val();
+  // option:selected').data('id')
+  console.log('Inside getPetVisits', id);
+  
+  $.ajax({
+      method: 'GET',
+      url: `/pet.router/visits/${id}`,
+      success: (response)=>{
+          console.log('Back from server with the visits table data: ');
+          $('#tableBody').empty();
+          console.log(response);
+          for (let i=0; i < response.length; i++) {
+              displayPetVisits(response[i]);
+          }
+      }
+  })
+} // end getPetVisits
+
+function displayPetVisits(data) {
+  $tableRow = $('<tr>');
+  $tableRow.append(`<td>${data.pet_name}</td>`);
+  $tableRow.append(`<td>${data.pet_breed}</td>`);
+  $tableRow.append(`<td>${data.pet_color}</td>`);
+  $tableRow.append(`<td>${data.check_in_date.substr(0, 10)}</td>`);
+  if (data.check_out_date == null) {
+      $tableRow.append(`<td>Pet is checked in</td>`);
+  }
+  else {
+  $tableRow.append(`<td>${data.check_out_date.substr(0, 10)}</td>`);
+  }
+  $('#tableBody').append($tableRow);
+} // end dipslayPetVisits
