@@ -3,6 +3,23 @@
 * Carter
 * Renee
 
+To run the app you will need to run --- npm install
+This should install express, body-parser, and pg.
+
+Make sure your DB is named pet_hotel.
+
+The SQL queries are included in the database.sql file, run them all to create the
+needed tables.
+
+
+
+
+
+
+
+
+
+--------------------------------------------------
 # CRUD Up Pet Hotel
 Your team has started a new business in Uptown for dog-enthusiasts that also need to vacation without their beloved pets.
 
