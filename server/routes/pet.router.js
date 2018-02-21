@@ -79,22 +79,23 @@ router.put ('/:id', (req, res) => {
                        VALUES ($1)`
                        pool.query(queryText, [req.params.id])
                        .then((results) => {
-                           console.log('IN INSERT NEW TIME TO VISITS');        
+                           console.log('IN INSERT NEW TIME TO VISITS');
                            res.sendStatus(201);
                        })
                     }
         else if (req.body.answer == 'No') {
-            let queryText = `SELECT visits.id 
+          // console.log(req.params.id, 'params in wlseif');
+            let queryText = `SELECT visits.id
               FROM visits
               WHERE pet_id = $1 AND check_out_date is NULL;`
             pool.query(queryText, [req.params.id])
                 .then((results) => {
-                let queryText = `UPDATE visits 
+                let queryText = `UPDATE visits
                   SET check_out_date = now()
                   WHERE pet_id = $1 AND visits.id = $2;`
                 pool.query(queryText, [req.params.id, results.rows[0].id])
                   .then((results) => {
-                  console.log('IN INSERT CHECKOUT TIME TO VISITS');        
+                  console.log('IN INSERT CHECKOUT TIME TO VISITS');
                   res.sendStatus(201);
                     })
                   .catch((err) => {
@@ -141,7 +142,7 @@ router.delete ('/:id', (req, res) => {
 // Start GET route.
 router.get('/visits/:id', (req, res) => {
     console.log(req.params.id, 'where are you');
-    
+
     const queryText = `SELECT owner.owner_id, owner.owner_first_name, owner.owner_last_name, pet.pet_id, pet.pet_name, pet.pet_breed, pet.pet_color, pet.pet_is_checked_in, visits.check_in_date, visits.check_out_date
 
     FROM owner
@@ -155,10 +156,10 @@ router.get('/visits/:id', (req, res) => {
 
     ORDER BY owner.owner_last_name,
     visits.check_out_date DESC;`
-    
+
     pool.query(queryText)
         .then((result) => {
-            console.log('"/" Results GET query for visits: ', result.rows); 
+            console.log('"/" Results GET query for visits: ', result.rows);
             res.send(result.rows);
         })
         .catch((err) => {
