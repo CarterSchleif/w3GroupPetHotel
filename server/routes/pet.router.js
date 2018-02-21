@@ -72,15 +72,39 @@ router.put ('/:id', (req, res) => {
   console.log(req.body.answer, 'in put for checkedin');
     let queryText = `UPDATE pet SET  pet_is_checked_in = $1 WHERE pet_id = $2`;
     pool.query(queryText, [req.body.answer, req.params.id])
-      .then((results) =>{
+      .then((results) => {
         console.log('LOGING REQ.BODY: ', req.body.answer);
-        res.sendStatus(200);
-      })
-      .catch((err) =>{
-        console.log('error making update pet status query:', err);
-        res.sendStatus(500);
-      });
-});// End PUT route
+        if (req.body.answer == 'Yes') {
+          let queryText = `INSERT INTO visits (pet_id)
+                       VALUES ($1)`
+                       pool.query(queryText, [req.params.id])
+                       .then((results) => {
+                           console.log('IN INSERT NEW TIME TO VISITS');        
+                           res.sendStatus(201);
+                       })
+                    }
+        else if (req.body.answer == 'No') {
+            let queryText = `SELECT visits.id 
+              FROM visits
+              WHERE pet_id = $1 AND check_out_date is NULL;`
+            pool.query(queryText, [req.params.id])
+                .then((results) => {
+                let queryText = `UPDATE visits 
+                  SET check_out_date = now()
+                  WHERE pet_id = $1 AND visits.id = $2;`
+                pool.query(queryText, [req.params.id, results.rows[0].id])
+                  .then((results) => {
+                  console.log('IN INSERT CHECKOUT TIME TO VISITS');        
+                  res.sendStatus(201);
+                    })
+                  .catch((err) => {
+                  console.log('error making update pet status query:', err);
+                  res.sendStatus(500);
+                    });
+                  })
+      }
+})
+})// End PUT route
 
 // Start PUT route
 router.put ('/update/:id', (req, res) => {
@@ -111,25 +135,37 @@ router.delete ('/:id', (req, res) => {
   });
 });// End DELETE route
 
+router.get('/visits', function (request, response) {
+  const sqlText = `SELECT * FROM visits 
+                  JOIN pets on pets.id = visits.pet_id;`;
+  pool.query(sqlText)
+  .then(function (result) {
+     response.send(result.rows);    
+  }).catch(function (error) {
+      response.sendStatus(500);
+  })
+})
+
+
 // Start GET route.
 router.get('/visits/:id', (req, res) => {
-    const queryText =   `SELECT owner.id, owner.first_name, owner.last_name, pet.id AS pet_id,
-                        pet_name, pet.breed, pet.color, pet.is_checked_in, visits.check_in_date,
-                        visits.check_out_date
-                        FROM owner
-                        JOIN pet ON owner.id = pet.owner_id
-                        JOIN visits ON pet.id = visits.pet_id
-                        WHERE owner.id = ${req.params.id}
-                        ORDER BY owner.last_name, visits.check_out_date DESC;`
+
+    const queryText = `SELECT owner.id, owner.first_name, owner.last_name, pet.id AS pet_id, pet.pet_name, pet.pet_breed, pet.pet_color, pet.pet_is_checked_in, visits.check_in_date, visits.check_out_date
+                       FROM owner
+                       JOIN pet ON owner.id = pet.owner_id
+                       JOIN visits ON pet.id = visits.pet_id
+                       WHERE owner.id = ${req.params.id}
+                       ORDER BY owner.last_name, visits.check_out_date DESC;`
     pool.query(queryText)
-    .then((result) => {
-        console.log('"/" GET results from query for visits: ', result.rows);
-        res.send(result.rows);
-    })
-    .catch((err) => {
-        console.log('Error on "/visits" GET', err);
-        res.sendStatus(500);
-    })
-})//end GET
+        .then((result) => {
+            console.log('"/" Results GET query for visits: ', result.rows); 
+            res.send(result.rows);
+        })
+        .catch((err) => {
+            console.log('error making "/visits" GET for visits: ', err);
+            res.sendStatus(500);
+        });
+});
+// End of GET.
 
 module.exports = router;
